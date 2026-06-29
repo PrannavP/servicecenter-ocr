@@ -1,2 +1,6 @@
 uploads
 venv
+
+*.tar
+
+/helper/__pycache__

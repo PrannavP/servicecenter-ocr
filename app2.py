@@ -6,6 +6,7 @@ import os
 import cv2
 import numpy as np
 from paddleocr import PaddleOCR
+from helper.extracted_key_value import parse_ocr_result
 
 app = Flask(__name__)
 
@@ -116,9 +117,12 @@ def upload_file_v2():
             for line in result[0]:
                 extracted_text.append(line[1][0])
 
+        parsed_data = parse_ocr_result(extracted_text)
+
         return jsonify({
+            "extracted_text": "\n".join(extracted_text),
             "filename": file.filename,
-            "extracted_text": "\n".join(extracted_text)
+            "data": parsed_data
         })
 
     except Exception as e:
