@@ -195,6 +195,9 @@ def upload_file_v3():
             if normalized_key == "customer name":
                 parsed_data["customer_name"] = value
 
+            if normalized_key == "customer address":
+                parsed_data["customer_address"] = value
+
             elif normalized_key == "customer number":
                 parsed_data["customer_number"] = value
 

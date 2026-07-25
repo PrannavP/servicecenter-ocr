@@ -11,6 +11,7 @@ def normalize(text):
 # add the fields of the job card here so it will be easier to map and send kvp.
 FIELD_MAP = {
     "customer name": "customer_name",
+    "customer address": "customer_address",
     "customer number": "customer_number",
     "vehicle type": "vehicle_type",
     "vehicle chasis number": "vehicle_chasis_number",
