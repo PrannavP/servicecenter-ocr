@@ -4,3 +4,5 @@ venv
 *.tar
 
 /helper/__pycache__
+
+.env
