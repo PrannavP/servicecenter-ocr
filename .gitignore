@@ -6,3 +6,5 @@ venv
 /helper/__pycache__
 
 .env
+__pycache__/
+*.pyc

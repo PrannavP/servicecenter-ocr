@@ -5,3 +5,5 @@ opencv-python
 numpy
 paddleocr
 paddlepaddle
+boto3
+python-dotenv
