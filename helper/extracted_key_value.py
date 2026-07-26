@@ -1,5 +1,3 @@
-# This is an helper function which processes the extracted text by OCR and then maps it into key value pair data strucuture and returns.
-# So i can map it in flutter app easily.
 
 import re
 
@@ -8,7 +6,6 @@ def normalize(text):
     text = re.sub(r'[^a-z0-9 ]', ' ', text)
     return " ".join(text.split())
 
-# add the fields of the job card here so it will be easier to map and send kvp.
 FIELD_MAP = {
     "customer name": "customer_name",
     "customer address": "customer_address",
@@ -37,11 +34,9 @@ def parse_ocr_result(extracted_text):
         line = lines[i]
         normalized = normalize(line)
 
-        # Description (multi-line)
         if normalized.startswith("description"):
             desc = []
 
-            # Same-line description
             if ":" in line:
                 after = line.split(":", 1)[1].strip()
                 after = re.sub(r'^\d+\.?\s*', '', after)
@@ -54,11 +49,9 @@ def parse_ocr_result(extracted_text):
                 current = lines[i]
                 current_normalized = normalize(current)
 
-                # Stop if another field begins
                 if current_normalized in FIELD_MAP:
                     break
 
-                # Ignore numbering (1, 2., 3...)
                 if re.fullmatch(r"\d+\.?", current):
                     i += 1
                     continue
@@ -73,22 +66,18 @@ def parse_ocr_result(extracted_text):
             data["description"] = desc
             continue
 
-        # Normal fields
         for field_name, json_key in FIELD_MAP.items():
 
             if normalized.startswith(field_name):
 
                 value = ""
 
-                # Same-line value
                 if ":" in line:
                     value = line.split(":", 1)[1].strip().strip(".")
 
-                # Next-line value
                 if not value and i + 1 < len(lines):
                     value = lines[i + 1].strip()
 
-                    # Ensure next line isn't another field
                     if normalize(value) in FIELD_MAP:
                         value = ""
                     else:

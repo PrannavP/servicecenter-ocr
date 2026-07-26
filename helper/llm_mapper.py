@@ -19,7 +19,6 @@ import json
 import re
 import urllib.request
 
-# Canonical schema the Flutter ResultScreen expects. `description` is a list.
 SCHEMA_FIELDS = [
     "customer_name",
     "customer_address",
@@ -56,7 +55,6 @@ _INSTRUCTIONS = (
     '{"data": {...schema fields...}, "confidence": {...}} with no prose, no code fences.'
 )
 
-
 def _schema_hint():
     return {
         "data": {
@@ -65,7 +63,6 @@ def _schema_hint():
         },
         "confidence": {**{f: 0 for f in SCHEMA_FIELDS}, "description": 0},
     }
-
 
 def _build_prompt(textract_kv, extracted_text):
     return (
@@ -77,7 +74,6 @@ def _build_prompt(textract_kv, extracted_text):
         + "\n\nRaw text lines:\n"
         + json.dumps(extracted_text or [], ensure_ascii=False)
     )
-
 
 def _extract_json(text):
     """Pull the first JSON object out of a model response, tolerating fences/prose."""
@@ -93,9 +89,6 @@ def _extract_json(text):
         return json.loads(text[start : end + 1])
     except json.JSONDecodeError:
         return None
-
-
-# ---- Providers -------------------------------------------------------------
 
 def _call_bedrock(prompt):
     """Primary: reuse the AWS credentials already used for Textract."""
@@ -117,7 +110,6 @@ def _call_bedrock(prompt):
     payload = json.loads(resp["body"].read())
     parts = payload.get("content", [])
     return "".join(p.get("text", "") for p in parts if p.get("type") == "text")
-
 
 def _call_anthropic(prompt):
     """Fallback: direct Anthropic API if ANTHROPIC_API_KEY is set."""
@@ -148,9 +140,6 @@ def _call_anthropic(prompt):
     parts = payload.get("content", [])
     return "".join(p.get("text", "") for p in parts if p.get("type") == "text")
 
-
-# ---- Public API ------------------------------------------------------------
-
 def _coerce(result, fallback_data):
     """Ensure a complete, well-typed schema regardless of what the model returned."""
     data = dict(result.get("data") or {})
@@ -162,7 +151,6 @@ def _coerce(result, fallback_data):
     for field in SCHEMA_FIELDS:
         val = data.get(field)
         if val is None or val == "":
-            # Borrow the rule-based value if the model left it blank.
             val = (fallback_data or {}).get(field, "") or ""
             out_conf[field] = float(conf.get(field, 0.4)) if val else 0.0
         else:
@@ -171,7 +159,6 @@ def _coerce(result, fallback_data):
             out_conf[field] = float(conf.get(field, 0.85))
         out_data[field] = val
 
-    # description as a list
     desc = data.get("description")
     if not isinstance(desc, list):
         desc = (fallback_data or {}).get("description")
@@ -182,7 +169,6 @@ def _coerce(result, fallback_data):
 
     return {"data": out_data, "confidence": out_conf}
 
-
 def _rule_confidence(fallback_data):
     """Confidence map for the pure rule-based path: filled => medium, blank => 0."""
     conf = {}
@@ -191,7 +177,6 @@ def _rule_confidence(fallback_data):
     desc = (fallback_data or {}).get("description") or []
     conf["description"] = 0.6 if desc else 0.0
     return conf
-
 
 def map_job_card(textract_kv, extracted_text, fallback_data):
     """
@@ -215,7 +200,6 @@ def map_job_card(textract_kv, extracted_text, fallback_data):
         except Exception as e:  # noqa: BLE001 - any failure -> try next / fallback
             print(f"[llm_mapper] {name} unavailable: {e}")
 
-    # Rule-based fallback (the existing behaviour), now with confidence info.
     fb = fallback_data or {}
     data = {f: (fb.get(f, "") or "") for f in SCHEMA_FIELDS}
     desc = fb.get("description")
