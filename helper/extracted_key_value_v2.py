@@ -15,7 +15,6 @@ def get_kv_map(response):
 
     return key_map, value_map, block_map
 
-
 def get_text(block, block_map):
     text = ""
 
@@ -38,7 +37,6 @@ def get_text(block, block_map):
 
     return text.strip()
 
-
 def find_value_block(key_block, value_map):
     if "Relationships" not in key_block:
         return None
@@ -51,7 +49,6 @@ def find_value_block(key_block, value_map):
             return value_map[value_id]
 
     return None
-
 
 def extract_key_value_pairs(response):
 
