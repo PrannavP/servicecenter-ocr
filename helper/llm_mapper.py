@@ -92,7 +92,7 @@ def _extract_json(text):
 
 def _call_bedrock(prompt):
     """Primary: reuse the AWS credentials already used for Textract."""
-    import boto3  # already a dependency (Textract)
+    import boto3  
 
     model_id = os.getenv(
         "BEDROCK_MODEL_ID", "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
@@ -197,7 +197,7 @@ def map_job_card(textract_kv, extracted_text, fallback_data):
                 merged = _coerce(parsed, fallback_data)
                 merged["mapping_source"] = name
                 return merged
-        except Exception as e:  # noqa: BLE001 - any failure -> try next / fallback
+        except Exception as e:  
             print(f"[llm_mapper] {name} unavailable: {e}")
 
     fb = fallback_data or {}

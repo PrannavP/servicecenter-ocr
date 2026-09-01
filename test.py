@@ -2,9 +2,6 @@ from paddleocr import PaddleOCR
 import cv2
 import numpy as np
 
-# ----------------------------
-# 1. Initialize OCR
-# ----------------------------
 ocr = PaddleOCR(
     use_angle_cls=True,
     lang="en",
@@ -13,54 +10,27 @@ ocr = PaddleOCR(
 
 image_path = "./uploads/image11.jpg"
 
-# ----------------------------
-# 2. Read image
-# ----------------------------
 img = cv2.imread(image_path)
 
-# ----------------------------
-# 3. Convert to grayscale
-# ----------------------------
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-# ----------------------------
-# 4. Denoise (important for phone images)
-# ----------------------------
 gray = cv2.fastNlMeansDenoising(gray, None, 30, 7, 21)
 
-# ----------------------------
-# 5. Improve contrast
-# ----------------------------
 gray = cv2.convertScaleAbs(gray, alpha=1.5, beta=10)
 
-# ----------------------------
-# 6. Sharpen image
-# ----------------------------
 kernel = np.array([[0, -1, 0],
                    [-1, 5, -1],
                    [0, -1, 0]])
 
 gray = cv2.filter2D(gray, -1, kernel)
 
-# ----------------------------
-# 7. Resize (VERY important for OCR)
-# ----------------------------
 gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
-# ----------------------------
-# 8. Save processed image (optional debug)
-# ----------------------------
 processed_path = "./uploads/processed_image.jpg"
 cv2.imwrite(processed_path, gray)
 
-# ----------------------------
-# 9. Run PaddleOCR
-# ----------------------------
 result = ocr.ocr(processed_path, cls=True)
 
-# ----------------------------
-# 10. Print results safely
-# ----------------------------
 if result and result[0]:
     for line in result[0]:
         print(line[1][0])
